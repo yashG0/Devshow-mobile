@@ -1,3 +1,4 @@
+import '../features/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -31,6 +32,10 @@ final appRouter = GoRouter(
           projectId: id,
         );
       },
+    ),
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfilePage(),
     ),
 
     GoRoute(
