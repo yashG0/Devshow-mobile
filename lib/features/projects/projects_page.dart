@@ -12,7 +12,6 @@ class ProjectsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final projects = ref.watch(projectsProvider);
-    
 
     return Scaffold(
       appBar: AppBar(

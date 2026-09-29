@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../core/theme/theme_provider.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -101,7 +104,7 @@ class ProfilePage extends ConsumerWidget {
             title: 'Theme',
             subtitle: 'System default',
             onTap: () {
-              _showThemeSelector(context);
+              _showThemeSelector(context, ref);
             },
           ),
 
@@ -135,7 +138,9 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  void _showThemeSelector(BuildContext context) {
+  void _showThemeSelector(BuildContext context, WidgetRef ref) {
+    final current = ref.read(themeModeProvider);
+
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -150,31 +155,53 @@ class ProfilePage extends ConsumerWidget {
                   style: TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.brightness_auto_outlined),
-                title: const Text('System'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
+              _themeOption(
+                context,
+                ref,
+                'System',
+                Icons.brightness_auto_outlined,
+                ThemeMode.system,
+                current,
               ),
-              ListTile(
-                leading: const Icon(Icons.light_mode_outlined),
-                title: const Text('Light'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
+              _themeOption(
+                context,
+                ref,
+                'Light',
+                Icons.light_mode_outlined,
+                ThemeMode.light,
+                current,
               ),
-              ListTile(
-                leading: const Icon(Icons.dark_mode_outlined),
-                title: const Text('Dark'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
+              _themeOption(
+                context,
+                ref,
+                'Dark',
+                Icons.dark_mode_outlined,
+                ThemeMode.dark,
+                current,
               ),
               const SizedBox(height: 8),
             ],
           ),
         );
+      },
+    );
+  }
+
+  Widget _themeOption(
+    BuildContext context,
+    WidgetRef ref,
+    String title,
+    IconData icon,
+    ThemeMode mode,
+    ThemeMode current,
+  ) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      trailing: mode == current ? const Icon(Icons.check_rounded) : null,
+      onTap: () {
+        ref.read(themeModeProvider.notifier).setTheme(mode);
+        Navigator.pop(context);
       },
     );
   }

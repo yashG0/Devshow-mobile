@@ -18,22 +18,14 @@ class ProjectRepository {
     }
 
     return data
-        .map(
-          (item) => Project.fromJson(
-            Map<String, dynamic>.from(item),
-          ),
-        )
+        .map((item) => Project.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
 
   Future<Project> getProject(int id) async {
-    final response = await api.dio.get(
-      '/api/projects/$id',
-    );
+    final response = await api.dio.get('/api/projects/$id');
 
-    return Project.fromJson(
-      Map<String, dynamic>.from(response.data),
-    );
+    return Project.fromJson(Map<String, dynamic>.from(response.data));
   }
 
   Future<Project> createProject({
@@ -56,9 +48,7 @@ class ProjectRepository {
       },
     );
 
-    return Project.fromJson(
-      Map<String, dynamic>.from(response.data),
-    );
+    return Project.fromJson(Map<String, dynamic>.from(response.data));
   }
 
   Future<Project> updateProject(
@@ -82,15 +72,10 @@ class ProjectRepository {
       },
     );
 
-    return Project.fromJson(
-      Map<String, dynamic>.from(response.data),
-    );
+    return Project.fromJson(Map<String, dynamic>.from(response.data));
   }
 
-  Future<Project> uploadMedia(
-    int projectId,
-    String filePath,
-  ) async {
+  Future<Project> uploadMedia(int projectId, String filePath) async {
     final formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(filePath),
     });
@@ -100,26 +85,18 @@ class ProjectRepository {
       data: formData,
     );
 
-    return Project.fromJson(
-      Map<String, dynamic>.from(response.data),
-    );
+    return Project.fromJson(Map<String, dynamic>.from(response.data));
   }
 
   Future<void> deleteProject(int id) async {
-    await api.dio.delete(
-      '/api/projects/$id',
-    );
+    await api.dio.delete('/api/projects/$id');
   }
 
   Future<void> publishProject(int id) async {
-    await api.dio.post(
-      '/api/projects/$id/publish',
-    );
+    await api.dio.post('/api/projects/$id/publish');
   }
 
   Future<void> unpublishProject(int id) async {
-    await api.dio.post(
-      '/api/projects/$id/unpublish',
-    );
+    await api.dio.post('/api/projects/$id/unpublish');
   }
 }

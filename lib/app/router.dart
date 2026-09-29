@@ -1,4 +1,5 @@
 import '../features/profile/profile_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,9 +17,7 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/projects/create',
       builder: (context, state) {
-        return const editor.ProjectEditorPage(
-          key: ValueKey('create-project'),
-        );
+        return const editor.ProjectEditorPage(key: ValueKey('create-project'));
       },
     ),
 
@@ -33,15 +32,9 @@ final appRouter = GoRouter(
         );
       },
     ),
-    GoRoute(
-      path: '/profile',
-      builder: (context, state) => const ProfilePage(),
-    ),
+    GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
 
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginPage(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
 
     GoRoute(
       path: '/register',
@@ -53,10 +46,7 @@ final appRouter = GoRouter(
         return DevShowShell(child: child);
       },
       routes: [
-        GoRoute(
-          path: '/home',
-          builder: (context, state) => const HomePage(),
-        ),
+        GoRoute(path: '/home', builder: (context, state) => const HomePage()),
 
         GoRoute(
           path: '/projects',
@@ -68,19 +58,14 @@ final appRouter = GoRouter(
           builder: (context, state) {
             final id = int.parse(state.pathParameters['id']!);
 
-            return ProjectDetailPage(
-              projectId: id,
-            );
+            return ProjectDetailPage(projectId: id);
           },
         ),
 
         GoRoute(
           path: '/profile',
-          builder: (context, state) => const Scaffold(
-            body: Center(
-              child: Text('Profile'),
-            ),
-          ),
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Profile'))),
         ),
       ],
     ),
