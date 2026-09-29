@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
+import '../../core/widgets/tech_chip.dart';
 import '../../models/project.dart';
 import 'project_provider.dart';
 
@@ -148,8 +148,8 @@ class ProjectCard extends StatelessWidget {
               runSpacing: 8,
               children: project.technologies
                   .take(4)
-                  .map(
-                    (technology) => _TechChip(
+                  .map<Widget>(
+                    (technology) => TechChip(
                       label: technology,
                     ),
                   )
@@ -197,37 +197,6 @@ class ProjectCard extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TechChip extends StatelessWidget {
-  final String label;
-
-  const _TechChip({
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 6,
-      ),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );

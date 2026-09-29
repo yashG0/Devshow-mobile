@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/widgets/section_header.dart';
+import '../../core/widgets/stat_item.dart';
 import '../auth/auth_provider.dart';
+import '../projects/project_provider.dart';
+import '../projects/projects_page.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -12,8 +16,9 @@ class HomePage extends ConsumerWidget {
     final theme = Theme.of(context);
     final auth = ref.watch(authProvider);
     final user = auth.asData?.value.user;
-
     final username = user?['username']?.toString() ?? 'developer';
+
+    final projects = ref.watch(projectsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,197 +26,205 @@ class HomePage extends ConsumerWidget {
           'DevShow',
           style: TextStyle(
             fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
+            letterSpacing: -0.6,
           ),
         ),
         actions: [
           IconButton(
             tooltip: 'Profile',
-            onPressed: () => context.push('/profile'),
+            onPressed: () => context.go('/profile'),
             icon: const Icon(Icons.person_outline_rounded),
-          ),
-          IconButton(
-            tooltip: 'Logout',
-            onPressed: () async {
-              await ref.read(authProvider.notifier).logout();
-
-              if (context.mounted) {
-                context.go('/login');
-              }
-            },
-            icon: const Icon(Icons.logout_rounded),
           ),
           const SizedBox(width: 8),
         ],
       ),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(authProvider);
-          },
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
-            children: [
-              Text(
-                'DEVELOPER WORKSPACE',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  letterSpacing: 1.5,
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(projectsProvider);
+          await ref.read(projectsProvider.future);
+        },
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          children: [
+            Text(
+              'WORKSPACE',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.6,
               ),
+            ),
 
-              const SizedBox(height: 10),
+            const SizedBox(height: 8),
 
-              Text(
-                'Welcome back, $username.',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -1,
-                ),
+            Text(
+              username,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -1,
               ),
+            ),
 
-              const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
-              Text(
-                'Build projects. Showcase your work. Ship something real.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  height: 1.5,
-                ),
+            Text(
+              'Your developer workspace.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
+            ),
 
-              const SizedBox(height: 28),
+            const SizedBox(height: 24),
 
-              // Workspace card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: theme.colorScheme.surfaceContainer,
-                  border: Border.all(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: theme.colorScheme.primaryContainer,
-                          ),
-                          child: Icon(
-                            Icons.terminal_rounded,
-                            color: theme.colorScheme.onPrimaryContainer,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Text(
-                            'Your workspace',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            // Stats
+            projects.when(
+              loading: () => const _StatsPlaceholder(),
+              error: (_, _) => const _StatsPlaceholder(),
+              data: (items) {
+                final published =
+                    items.where((project) => project.published).length;
 
-                    const SizedBox(height: 20),
+                final views = items.fold<int>(
+                  0,
+                  (sum, project) => sum + project.viewCount,
+                );
 
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _Stat(
-                            label: 'Projects',
-                            value: '—',
-                          ),
-                        ),
-                        Expanded(
-                          child: _Stat(
-                            label: 'Published',
-                            value: '—',
-                          ),
-                        ),
-                        Expanded(
-                          child: _Stat(
-                            label: 'Views',
-                            value: '—',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 28),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'PROJECTS',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      letterSpacing: 1.4,
-                      fontWeight: FontWeight.w700,
+                return Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: theme.colorScheme.outline,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => context.push('/projects'),
-                    child: const Text('View all'),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: StatItem(
+                          value: '${items.length}',
+                          label: 'Projects',
+                        ),
+                      ),
+                      Expanded(
+                        child: StatItem(
+                          value: '$published',
+                          label: 'Published',
+                        ),
+                      ),
+                      Expanded(
+                        child: StatItem(
+                          value: '$views',
+                          label: 'Views',
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
+            ),
 
-              const SizedBox(height: 8),
+            const SizedBox(height: 32),
 
-              _EmptyProjects(
-                onCreate: () => context.push('/projects/create'),
+            SectionHeader(
+              title: 'Your projects',
+              action: 'View all',
+              onAction: () => context.go('/projects'),
+            ),
+
+            const SizedBox(height: 12),
+
+            projects.when(
+              loading: () => const _ProjectLoadingCard(),
+              error: (error, _) => _ProjectError(
+                onRetry: () => ref.invalidate(projectsProvider),
               ),
-            ],
-          ),
+              data: (items) {
+                if (items.isEmpty) {
+                  return _EmptyProjects(
+                    onCreate: () => context.go('/projects/create'),
+                  );
+                }
+
+                return Column(
+                  children: items
+                      .take(3)
+                      .map(
+                        (project) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: ProjectCard(project: project),
+                        ),
+                      )
+                      .toList(),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _Stat extends StatelessWidget {
-  final String label;
-  final String value;
+class _StatsPlaceholder extends StatelessWidget {
+  const _StatsPlaceholder();
 
-  const _Stat({
-    required this.label,
-    required this.value,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 88,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+class _ProjectLoadingCard extends StatelessWidget {
+  const _ProjectLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 170,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+class _ProjectError extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _ProjectError({
+    required this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.cloud_off_outlined),
+          const SizedBox(height: 10),
+          const Text('Could not load projects'),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: onRetry,
+            child: const Text('Try again'),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -225,39 +238,29 @@ class _EmptyProjects extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant,
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.code_off_rounded,
-            size: 36,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: 14),
-          Text(
+          const Icon(Icons.code_off_rounded, size: 32),
+          const SizedBox(height: 12),
+          const Text(
             'No projects yet',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: TextStyle(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(
-            'Create your first project and start building your showcase.',
+            'Start building your developer showcase.',
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+            style: Theme.of(context).textTheme.bodySmall,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           FilledButton.icon(
             onPressed: onCreate,
             icon: const Icon(Icons.add_rounded),
