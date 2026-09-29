@@ -180,15 +180,62 @@ class _ProjectEditorPageState
     );
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Project editor is ready.'),
-      ),
-    );
+    final technologies = _technologiesController.text
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    try {
+      final repository = ref.read(projectRepositoryProvider);
+
+      if (widget.projectId == null) {
+        await repository.createProject(
+          title: _titleController.text.trim(),
+          tagline: _taglineController.text.trim(),
+          description: _descriptionController.text.trim(),
+          technologies: technologies,
+          githubUrl: _githubController.text.trim().isEmpty
+              ? null
+              : _githubController.text.trim(),
+          demoUrl: _demoController.text.trim().isEmpty
+              ? null
+              : _demoController.text.trim(),
+        );
+      } else {
+        await repository.updateProject(
+          widget.projectId!,
+          title: _titleController.text.trim(),
+          tagline: _taglineController.text.trim(),
+          description: _descriptionController.text.trim(),
+          technologies: technologies,
+          githubUrl: _githubController.text.trim().isEmpty
+              ? null
+              : _githubController.text.trim(),
+          demoUrl: _demoController.text.trim().isEmpty
+              ? null
+              : _demoController.text.trim(),
+        );
+      }
+
+      ref.invalidate(projectsProvider);
+
+      if (mounted) {
+        context.go('/projects');
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to save project: $e'),
+        ),
+      );
+    }
   }
 }
