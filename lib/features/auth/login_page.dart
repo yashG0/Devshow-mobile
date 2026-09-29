@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth_provider.dart';
@@ -24,14 +25,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _login() async {
-    if (usernameController.text.trim().isEmpty ||
-        passwordController.text.isEmpty) {
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter your username and password.'),
+        ),
+      );
       return;
     }
 
     await ref.read(authProvider.notifier).login(
-          usernameController.text.trim(),
-          passwordController.text,
+          username,
+          password,
         );
 
     if (!mounted) return;
@@ -41,9 +49,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (auth.hasError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(auth.error.toString()),
+          content: Text(
+            'Login failed: ${auth.error}',
+          ),
         ),
       );
+      return;
+    }
+
+    if (auth.asData?.value.isAuthenticated == true) {
+      context.go('/home');
     }
   }
 
@@ -221,6 +236,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       ),
                                     ),
                             ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          TextButton(
+                            onPressed: () => context.go('/register'),
+                            child: const Text("Don't have an account? Create one"),
                           ),
                         ],
                       ),
