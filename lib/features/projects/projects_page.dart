@@ -12,7 +12,7 @@ class ProjectsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final projects = ref.watch(projectsProvider);
-    final theme = Theme.of(context);
+    
 
     return Scaffold(
       appBar: AppBar(

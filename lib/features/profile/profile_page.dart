@@ -12,7 +12,7 @@ class ProfilePage extends ConsumerWidget {
     final theme = Theme.of(context);
     final authState = ref.watch(authProvider);
 
-    final user = authState.valueOrNull?.user;
+    final user = authState.asData?.value.user;
 
     final username = user?['username']?.toString() ?? 'username';
     final email = user?['email']?.toString() ?? '';
