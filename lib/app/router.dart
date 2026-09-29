@@ -6,6 +6,8 @@ import '../features/auth/login_page.dart';
 import '../features/auth/register_page.dart';
 import '../features/home/home_page.dart';
 import '../features/projects/projects_page.dart';
+import '../features/projects/project_detail_page.dart';
+
 
 final appRouter = GoRouter(
   initialLocation: '/login',
@@ -26,6 +28,15 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/home',
           builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: '/projects/:id',
+          builder: (context, state) {
+            final id = int.parse(state.pathParameters['id']!);
+            return ProjectDetailPage(
+              projectId: id,
+            );
+          },
         ),
         GoRoute(
           path: '/projects',

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../core/widgets/tech_chip.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/widgets/tech_chip.dart';
 import '../../models/project.dart';
 import 'project_provider.dart';
 
@@ -95,8 +95,6 @@ class ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () => context.push('/projects/${project.id}'),
@@ -149,13 +147,10 @@ class ProjectCard extends StatelessWidget {
               children: project.technologies
                   .take(4)
                   .map<Widget>(
-                    (technology) => TechChip(
-                      label: technology,
-                    ),
+                    (technology) => TechChip(label: technology),
                   )
                   .toList(),
             ),
-
             const SizedBox(height: 18),
 
             Row(

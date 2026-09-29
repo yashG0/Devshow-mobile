@@ -26,10 +26,11 @@ class TechChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'monospace',
           fontSize: 11,
           fontWeight: FontWeight.w600,
+          color: theme.colorScheme.onSurface,
         ),
       ),
     );

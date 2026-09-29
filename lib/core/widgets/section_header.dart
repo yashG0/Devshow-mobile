@@ -17,13 +17,14 @@ class SectionHeader extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title.toUpperCase(),
-          style: theme.textTheme.labelMedium?.copyWith(
-            letterSpacing: 1.4,
-            fontWeight: FontWeight.w700,
+        Expanded(
+          child: Text(
+            title.toUpperCase(),
+            style: theme.textTheme.labelMedium?.copyWith(
+              letterSpacing: 1.3,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
         if (action != null)
