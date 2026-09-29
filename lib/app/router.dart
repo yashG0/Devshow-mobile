@@ -7,11 +7,23 @@ import '../features/auth/register_page.dart';
 import '../features/home/home_page.dart';
 import '../features/projects/projects_page.dart';
 import '../features/projects/project_detail_page.dart';
+import '../features/projects/project_editor_page.dart';
 
 
 final appRouter = GoRouter(
   initialLocation: '/login',
   routes: [
+    GoRoute(
+      path: '/projects/create',
+      builder: (context, state) => const ProjectEditorPage(),
+    ),
+    GoRoute(
+      path: '/projects/:id/edit',
+      builder: (context, state) {
+        final id = int.parse(state.pathParameters['id']!);
+        return ProjectEditorPage(projectId: id);
+      },
+    ),
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginPage(),
