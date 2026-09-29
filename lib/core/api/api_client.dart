@@ -1,11 +1,14 @@
 import 'package:dio/dio.dart';
 
+import '../storage/token_storage.dart';
+
 class ApiClient {
   static const baseUrl = 'https://api.devshow.yashgaurkar.me';
 
   final Dio dio;
+  final TokenStorage storage;
 
-  ApiClient()
+  ApiClient(this.storage)
       : dio = Dio(
           BaseOptions(
             baseUrl: baseUrl,
@@ -15,5 +18,19 @@ class ApiClient {
               'Accept': 'application/json',
             },
           ),
-        );
+        ) {
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await storage.readToken();
+
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+
+          handler.next(options);
+        },
+      ),
+    );
+  }
 }
