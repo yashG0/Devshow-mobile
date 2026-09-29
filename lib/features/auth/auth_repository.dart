@@ -9,19 +9,11 @@ class AuthRepository {
 
   AuthRepository(this.api, this.storage);
 
-  Future<Map<String, dynamic>> login(
-    String username,
-    String password,
-  ) async {
+  Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await api.dio.post(
       '/api/auth/token',
-      data: FormData.fromMap({
-        'username': username,
-        'password': password,
-      }),
-      options: Options(
-        contentType: Headers.formUrlEncodedContentType,
-      ),
+      data: FormData.fromMap({'username': username, 'password': password}),
+      options: Options(contentType: Headers.formUrlEncodedContentType),
     );
 
     final token = response.data['access_token'] as String;
@@ -37,11 +29,7 @@ class AuthRepository {
   }) async {
     final response = await api.dio.post(
       '/api/auth/register',
-      data: {
-        'username': username,
-        'email': email,
-        'password': password,
-      },
+      data: {'username': username, 'email': email, 'password': password},
     );
 
     return Map<String, dynamic>.from(response.data);

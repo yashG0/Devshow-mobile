@@ -27,8 +27,7 @@ class AuthState {
   bool get isAuthenticated => user != null;
 }
 
-final authProvider =
-    AsyncNotifierProvider<AuthController, AuthState>(
+final authProvider = AsyncNotifierProvider<AuthController, AuthState>(
   AuthController.new,
 );
 

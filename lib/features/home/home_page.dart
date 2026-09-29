@@ -24,10 +24,7 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text(
           'DevShow',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.6,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.6),
         ),
         actions: [
           IconButton(
@@ -81,8 +78,9 @@ class HomePage extends ConsumerWidget {
               loading: () => const _StatsPlaceholder(),
               error: (_, _) => const _StatsPlaceholder(),
               data: (items) {
-                final published =
-                    items.where((project) => project.published).length;
+                final published = items
+                    .where((project) => project.published)
+                    .length;
 
                 final views = items.fold<int>(
                   0,
@@ -94,9 +92,7 @@ class HomePage extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: theme.colorScheme.outline,
-                    ),
+                    border: Border.all(color: theme.colorScheme.outline),
                   ),
                   child: Row(
                     children: [
@@ -113,10 +109,7 @@ class HomePage extends ConsumerWidget {
                         ),
                       ),
                       Expanded(
-                        child: StatItem(
-                          value: '$views',
-                          label: 'Views',
-                        ),
+                        child: StatItem(value: '$views', label: 'Views'),
                       ),
                     ],
                   ),
@@ -199,9 +192,7 @@ class _ProjectLoadingCard extends StatelessWidget {
 class _ProjectError extends StatelessWidget {
   final VoidCallback onRetry;
 
-  const _ProjectError({
-    required this.onRetry,
-  });
+  const _ProjectError({required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -209,9 +200,7 @@ class _ProjectError extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-        ),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         children: [
@@ -219,10 +208,7 @@ class _ProjectError extends StatelessWidget {
           const SizedBox(height: 10),
           const Text('Could not load projects'),
           const SizedBox(height: 12),
-          OutlinedButton(
-            onPressed: onRetry,
-            child: const Text('Try again'),
-          ),
+          OutlinedButton(onPressed: onRetry, child: const Text('Try again')),
         ],
       ),
     );
@@ -232,9 +218,7 @@ class _ProjectError extends StatelessWidget {
 class _EmptyProjects extends StatelessWidget {
   final VoidCallback onCreate;
 
-  const _EmptyProjects({
-    required this.onCreate,
-  });
+  const _EmptyProjects({required this.onCreate});
 
   @override
   Widget build(BuildContext context) {
@@ -242,9 +226,7 @@ class _EmptyProjects extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-        ),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         children: [

@@ -14,15 +14,16 @@ class AppTheme {
   static const danger = Color(0xFFFF6B6B);
 
   static ThemeData get dark {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: primary,
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: primary,
-      surface: background,
-      onSurface: text,
-      outline: border,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: primary,
+          brightness: Brightness.dark,
+        ).copyWith(
+          primary: primary,
+          surface: background,
+          onSurface: text,
+          outline: border,
+        );
 
     return ThemeData(
       brightness: Brightness.dark,

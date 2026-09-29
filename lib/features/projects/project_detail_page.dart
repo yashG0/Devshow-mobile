@@ -8,18 +8,12 @@ import 'project_provider.dart';
 class ProjectDetailPage extends ConsumerWidget {
   final int projectId;
 
-  const ProjectDetailPage({
-    super.key,
-    required this.projectId,
-  });
+  const ProjectDetailPage({super.key, required this.projectId});
 
   Future<void> _openUrl(String url) async {
     final uri = Uri.tryParse(url);
     if (uri != null) {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -29,13 +23,9 @@ class ProjectDetailPage extends ConsumerWidget {
     final project = ref.watch(projectDetailProvider(projectId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Project'),
-      ),
+      appBar: AppBar(title: const Text('Project')),
       body: project.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -48,9 +38,7 @@ class ProjectDetailPage extends ConsumerWidget {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () {
-                    ref.invalidate(
-                      projectDetailProvider(projectId),
-                    );
+                    ref.invalidate(projectDetailProvider(projectId));
                   },
                   child: const Text('Retry'),
                 ),
@@ -61,12 +49,8 @@ class ProjectDetailPage extends ConsumerWidget {
         data: (project) {
           return RefreshIndicator(
             onRefresh: () async {
-              ref.invalidate(
-                projectDetailProvider(projectId),
-              );
-              await ref.read(
-                projectDetailProvider(projectId).future,
-              );
+              ref.invalidate(projectDetailProvider(projectId));
+              await ref.read(projectDetailProvider(projectId).future);
             },
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -93,9 +77,7 @@ class ProjectDetailPage extends ConsumerWidget {
 
                 Row(
                   children: [
-                    _StatusBadge(
-                      published: project.published,
-                    ),
+                    _StatusBadge(published: project.published),
                     const SizedBox(width: 10),
                     Icon(
                       Icons.visibility_outlined,
@@ -156,44 +138,34 @@ class ProjectDetailPage extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: theme.colorScheme.outline,
-                      ),
+                      border: Border.all(color: theme.colorScheme.outline),
                     ),
                     child: Text(
                       project.description!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: 1.65,
-                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(height: 1.65),
                     ),
                   ),
                 ],
 
-                if (project.githubUrl != null ||
-                    project.demoUrl != null) ...[
+                if (project.githubUrl != null || project.demoUrl != null) ...[
                   const SizedBox(height: 28),
                   Row(
                     children: [
                       if (project.githubUrl != null)
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () =>
-                                _openUrl(project.githubUrl!),
+                            onPressed: () => _openUrl(project.githubUrl!),
                             icon: const Icon(Icons.code_rounded),
                             label: const Text('GitHub'),
                           ),
                         ),
-                      if (project.githubUrl != null &&
-                          project.demoUrl != null)
+                      if (project.githubUrl != null && project.demoUrl != null)
                         const SizedBox(width: 10),
                       if (project.demoUrl != null)
                         Expanded(
                           child: FilledButton.icon(
-                            onPressed: () =>
-                                _openUrl(project.demoUrl!),
-                            icon: const Icon(
-                              Icons.open_in_new_rounded,
-                            ),
+                            onPressed: () => _openUrl(project.demoUrl!),
+                            icon: const Icon(Icons.open_in_new_rounded),
                             label: const Text('Live Demo'),
                           ),
                         ),
@@ -212,19 +184,14 @@ class ProjectDetailPage extends ConsumerWidget {
 class _StatusBadge extends StatelessWidget {
   final bool published;
 
-  const _StatusBadge({
-    required this.published,
-  });
+  const _StatusBadge({required this.published});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: published
             ? theme.colorScheme.primary.withValues(alpha: 0.12)
@@ -253,9 +220,7 @@ class _StatusBadge extends StatelessWidget {
 class _ScreenshotGallery extends StatelessWidget {
   final List<String> paths;
 
-  const _ScreenshotGallery({
-    required this.paths,
-  });
+  const _ScreenshotGallery({required this.paths});
 
   @override
   Widget build(BuildContext context) {
@@ -265,9 +230,7 @@ class _ScreenshotGallery extends StatelessWidget {
         itemCount: paths.length,
         itemBuilder: (context, index) {
           return Container(
-            margin: EdgeInsets.only(
-              right: index == paths.length - 1 ? 0 : 12,
-            ),
+            margin: EdgeInsets.only(right: index == paths.length - 1 ? 0 : 12),
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainer,
@@ -278,10 +241,7 @@ class _ScreenshotGallery extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (_, _, _) {
                 return const Center(
-                  child: Icon(
-                    Icons.image_not_supported_outlined,
-                    size: 36,
-                  ),
+                  child: Icon(Icons.image_not_supported_outlined, size: 36),
                 );
               },
             ),

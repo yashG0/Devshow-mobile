@@ -4,10 +4,7 @@ import 'package:go_router/go_router.dart';
 class DevShowShell extends StatelessWidget {
   final Widget child;
 
-  const DevShowShell({
-    super.key,
-    required this.child,
-  });
+  const DevShowShell({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

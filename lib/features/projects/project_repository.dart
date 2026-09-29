@@ -16,19 +16,13 @@ class ProjectRepository {
     }
 
     return data
-        .map(
-          (item) => Project.fromJson(
-            Map<String, dynamic>.from(item),
-          ),
-        )
+        .map((item) => Project.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
 
   Future<Project> getProject(int id) async {
     final response = await api.dio.get('/api/projects/$id');
 
-    return Project.fromJson(
-      Map<String, dynamic>.from(response.data),
-    );
+    return Project.fromJson(Map<String, dynamic>.from(response.data));
   }
 }

@@ -31,7 +31,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       return;
     }
 
-    await ref.read(authProvider.notifier).register(
+    await ref
+        .read(authProvider.notifier)
+        .register(
           username: username.text.trim(),
           email: email.text.trim(),
           password: password.text,
@@ -42,11 +44,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final auth = ref.read(authProvider);
 
     if (auth.hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(auth.error.toString()),
-        ),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(auth.error.toString())));
     } else {
       context.go('/home');
     }

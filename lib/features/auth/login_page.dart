@@ -30,30 +30,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Enter your username and password.'),
-        ),
+        const SnackBar(content: Text('Enter your username and password.')),
       );
       return;
     }
 
-    await ref.read(authProvider.notifier).login(
-          username,
-          password,
-        );
+    await ref.read(authProvider.notifier).login(username, password);
 
     if (!mounted) return;
 
     final auth = ref.read(authProvider);
 
     if (auth.hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Login failed: ${auth.error}',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Login failed: ${auth.error}')));
       return;
     }
 
@@ -142,8 +132,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         color: theme.colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: theme.colorScheme.outlineVariant
-                              .withValues(alpha: 0.6),
+                          color: theme.colorScheme.outlineVariant.withValues(
+                            alpha: 0.6,
+                          ),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -241,7 +232,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                           TextButton(
                             onPressed: () => context.go('/register'),
-                            child: const Text("Don't have an account? Create one"),
+                            child: const Text(
+                              "Don't have an account? Create one",
+                            ),
                           ),
                         ],
                       ),

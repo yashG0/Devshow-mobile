@@ -9,16 +9,14 @@ class ApiClient {
   final TokenStorage storage;
 
   ApiClient(this.storage)
-      : dio = Dio(
-          BaseOptions(
-            baseUrl: baseUrl,
-            connectTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 15),
-            headers: {
-              'Accept': 'application/json',
-            },
-          ),
-        ) {
+    : dio = Dio(
+        BaseOptions(
+          baseUrl: baseUrl,
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 15),
+          headers: {'Accept': 'application/json'},
+        ),
+      ) {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {

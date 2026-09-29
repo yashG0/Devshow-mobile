@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/tech_chip.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../core/widgets/tech_chip.dart';
 import '../../models/project.dart';
 import 'project_provider.dart';
 
@@ -21,32 +22,21 @@ class ProjectsPage extends ConsumerWidget {
         ),
       ),
       body: projects.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.cloud_off_rounded,
-                  size: 40,
-                ),
+                const Icon(Icons.cloud_off_rounded, size: 40),
                 const SizedBox(height: 16),
                 const Text(
                   'Could not load projects',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                ),
+                Text(error.toString(), textAlign: TextAlign.center),
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: () {
@@ -60,9 +50,7 @@ class ProjectsPage extends ConsumerWidget {
         ),
         data: (items) {
           if (items.isEmpty) {
-            return const Center(
-              child: Text('No projects yet.'),
-            );
+            return const Center(child: Text('No projects yet.'));
           }
 
           return RefreshIndicator(
@@ -88,13 +76,11 @@ class ProjectsPage extends ConsumerWidget {
 class ProjectCard extends StatelessWidget {
   final Project project;
 
-  const ProjectCard({
-    super.key,
-    required this.project,
-  });
+  const ProjectCard({super.key, required this.project});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () => context.push('/projects/${project.id}'),
@@ -103,9 +89,7 @@ class ProjectCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: theme.colorScheme.outlineVariant,
-          ),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,10 +106,7 @@ class ProjectCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Icon(
-                  Icons.arrow_outward_rounded,
-                  size: 20,
-                ),
+                const Icon(Icons.arrow_outward_rounded, size: 20),
               ],
             ),
 
@@ -146,9 +127,7 @@ class ProjectCard extends StatelessWidget {
               runSpacing: 8,
               children: project.technologies
                   .take(4)
-                  .map<Widget>(
-                    (technology) => TechChip(label: technology),
-                  )
+                  .map<Widget>((technology) => TechChip(label: technology))
                   .toList(),
             ),
             const SizedBox(height: 18),

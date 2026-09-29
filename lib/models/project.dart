@@ -37,11 +37,7 @@ class Project {
       published: json['published'] as bool? ?? false,
       viewCount: json['view_count'] as int? ?? 0,
       media: (json['media'] as List<dynamic>? ?? [])
-          .map(
-            (e) => ProjectMedia.fromJson(
-              Map<String, dynamic>.from(e),
-            ),
-          )
+          .map((e) => ProjectMedia.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
     );
   }
@@ -51,15 +47,9 @@ class ProjectMedia {
   final int id;
   final String path;
 
-  const ProjectMedia({
-    required this.id,
-    required this.path,
-  });
+  const ProjectMedia({required this.id, required this.path});
 
   factory ProjectMedia.fromJson(Map<String, dynamic> json) {
-    return ProjectMedia(
-      id: json['id'] as int,
-      path: json['path'] as String,
-    );
+    return ProjectMedia(id: json['id'] as int, path: json['path'] as String);
   }
 }
