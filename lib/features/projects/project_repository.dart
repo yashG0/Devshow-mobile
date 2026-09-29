@@ -26,3 +26,32 @@ class ProjectRepository {
     return Project.fromJson(Map<String, dynamic>.from(response.data));
   }
 }
+
+Future<Project> uploadMedia(
+  int projectId,
+  String filePath,
+) async {
+  final formData = FormData.fromMap({
+    'file': await MultipartFile.fromFile(filePath),
+  });
+
+  final response = await api.dio.post(
+    '/api/projects/$projectId/media',
+    data: formData,
+  );
+
+  return Project.fromJson(
+    Map<String, dynamic>.from(response.data),
+  );
+}
+Future<void> deleteProject(int id) async {
+  await api.dio.delete('/api/projects/$id');
+}
+
+Future<void> publishProject(int id) async {
+  await api.dio.post('/api/projects/$id/publish');
+}
+
+Future<void> unpublishProject(int id) async {
+  await api.dio.post('/api/projects/$id/unpublish');
+}

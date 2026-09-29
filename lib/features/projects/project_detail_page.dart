@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/widgets/tech_chip.dart';
@@ -12,44 +13,175 @@ class ProjectDetailPage extends ConsumerWidget {
 
   Future<void> _openUrl(String url) async {
     final uri = Uri.tryParse(url);
-    if (uri != null) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (uri == null) return;
+
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _togglePublish(
+    BuildContext context,
+    WidgetRef ref,
+    bool published,
+  ) async {
+    final repository = ref.read(projectRepositoryProvider);
+
+    try {
+      if (published) {
+        await repository.unpublishProject(projectId);
+      } else {
+        await repository.publishProject(projectId);
+      }
+
+      ref.invalidate(projectDetailProvider(projectId));
+      ref.invalidate(projectsProvider);
+
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            published ? 'Project unpublished' : 'Project published',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Action failed: $e')));
+    }
+  }
+
+  Future<void> _deleteProject(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete project?'),
+          content: const Text(
+            'This will permanently delete the project and its media.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await ref.read(projectRepositoryProvider).deleteProject(projectId);
+
+      ref.invalidate(projectsProvider);
+
+      if (!context.mounted) return;
+
+      context.go('/projects');
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Project deleted')));
+    } catch (e) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete project: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final project = ref.watch(projectDetailProvider(projectId));
+    final projectAsync = ref.watch(projectDetailProvider(projectId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Project')),
-      body: project.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error_outline_rounded, size: 40),
-                const SizedBox(height: 12),
-                const Text('Unable to load project'),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () {
-                    ref.invalidate(projectDetailProvider(projectId));
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
+      appBar: AppBar(
+        title: const Text(
+          'Project',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        actions: [
+          projectAsync.maybeWhen(
+            data: (project) {
+              return PopupMenuButton<String>(
+                tooltip: 'Project actions',
+                onSelected: (value) {
+                  switch (value) {
+                    case 'edit':
+                      context.push('/projects/$projectId/edit');
+                      break;
+
+                    case 'publish':
+                      _togglePublish(context, ref, project.published);
+                      break;
+
+                    case 'delete':
+                      _deleteProject(context, ref);
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.edit_outlined),
+                      title: Text('Edit project'),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'publish',
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        project.published
+                            ? Icons.visibility_off_outlined
+                            : Icons.publish_outlined,
+                      ),
+                      title: Text(project.published ? 'Unpublish' : 'Publish'),
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.delete_outline_rounded),
+                      title: Text('Delete project'),
+                    ),
+                  ),
+                ],
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
           ),
+        ],
+      ),
+      body: projectAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => _ErrorState(
+          onRetry: () {
+            ref.invalidate(projectDetailProvider(projectId));
+          },
         ),
         data: (project) {
           return RefreshIndicator(
             onRefresh: () async {
               ref.invalidate(projectDetailProvider(projectId));
+
               await ref.read(projectDetailProvider(projectId).future);
             },
             child: ListView(
@@ -154,7 +286,9 @@ class ProjectDetailPage extends ConsumerWidget {
                       if (project.githubUrl != null)
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _openUrl(project.githubUrl!),
+                            onPressed: () {
+                              _openUrl(project.githubUrl!);
+                            },
                             icon: const Icon(Icons.code_rounded),
                             label: const Text('GitHub'),
                           ),
@@ -164,7 +298,9 @@ class ProjectDetailPage extends ConsumerWidget {
                       if (project.demoUrl != null)
                         Expanded(
                           child: FilledButton.icon(
-                            onPressed: () => _openUrl(project.demoUrl!),
+                            onPressed: () {
+                              _openUrl(project.demoUrl!);
+                            },
                             icon: const Icon(Icons.open_in_new_rounded),
                             label: const Text('Live Demo'),
                           ),
@@ -224,6 +360,8 @@ class _ScreenshotGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return SizedBox(
       height: 210,
       child: PageView.builder(
@@ -233,20 +371,53 @@ class _ScreenshotGallery extends StatelessWidget {
             margin: EdgeInsets.only(right: index == paths.length - 1 ? 0 : 12),
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainer,
+              color: theme.colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.colorScheme.outline),
             ),
             child: Image.network(
               paths[index],
               fit: BoxFit.cover,
               errorBuilder: (_, _, _) {
-                return const Center(
-                  child: Icon(Icons.image_not_supported_outlined, size: 36),
+                return Center(
+                  child: Icon(
+                    Icons.image_not_supported_outlined,
+                    size: 36,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 );
               },
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _ErrorState({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline_rounded, size: 40),
+            const SizedBox(height: 12),
+            const Text(
+              'Unable to load project',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 16),
+            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
       ),
     );
   }
