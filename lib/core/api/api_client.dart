@@ -2,6 +2,10 @@ import 'package:dio/dio.dart';
 
 import '../storage/token_storage.dart';
 
+String getMediaUrl(String path) {
+  return '${ApiClient.baseUrl}/${path.replaceFirst(RegExp(r'^/+'), '')}';
+}
+
 class ApiClient {
   static const baseUrl = 'https://api.devshow.yashgaurkar.me';
 

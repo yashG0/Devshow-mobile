@@ -3,6 +3,8 @@ import '../features/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/public/public_developer_page.dart';
+import '../features/public/public_project_page.dart';
 import '../core/widgets/devshow_shell.dart';
 import '../features/auth/login_page.dart';
 import '../features/auth/register_page.dart';
@@ -20,7 +22,22 @@ final appRouter = GoRouter(
         return const editor.ProjectEditorPage(key: ValueKey('create-project'));
       },
     ),
+    GoRoute(
+      path: '/dev/:username/:slug',
+      builder: (context, state) {
+        return PublicProjectPage(
+          username: state.pathParameters['username']!,
+          slug: state.pathParameters['slug']!,
+        );
+      },
+    ),
 
+    GoRoute(
+      path: '/dev/:username',
+      builder: (context, state) {
+        return PublicDeveloperPage(username: state.pathParameters['username']!);
+      },
+    ),
     GoRoute(
       path: '/projects/:id/edit',
       builder: (context, state) {
